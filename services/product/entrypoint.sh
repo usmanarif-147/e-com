@@ -19,7 +19,7 @@ echo "Container Started"
 
 chown -R 1000:1000 /var/www
 
-if [ ! -f vendor/autoload.php ]; then
+if [ ! -d vendor ]; then
     composer install
 fi
 
@@ -28,14 +28,9 @@ if [ ! -f .env ]; then
     php artisan key:generate
 fi
 
-if [ -f artisan ]; then
-
-    echo "Clearing Laravel cache..."
-    php artisan optimize:clear
-
-    echo "Starting Laravel..."
-    exec php artisan serve --host=0.0.0.0 --port=8000
-
+# Execute command passed to container
+if [ -f /var/www/artisan ]; then
+    php artisan serve --host=0.0.0.0 --port=8000
+else
+    exec "$@"
 fi
-
-exec "$@"
